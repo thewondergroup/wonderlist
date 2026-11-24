@@ -568,6 +568,26 @@ section > .wrap > .occasion-row:first-child { border-top: 1px solid var(--line);
 .gold-feature-lead { justify-content: center; }
 .gold-feature .gold-benefits { margin-top: 12px; }
 
+
+/* ---------- Perks, refined: a slim gold tag with the W, never a block ---------- */
+.perk, .perk-pill {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 0; height: 26px; padding: 0 11px 0 9px;
+  background: var(--gold); color: #fff; border-radius: 6px; box-shadow: none;
+  font-family: var(--body); font-size: 11.5px; font-weight: 500; line-height: 1; letter-spacing: 0.01em; white-space: nowrap;
+}
+.perk svg, .perk-pill svg { width: 15px; height: auto; flex: none; opacity: 0.95; }
+.perk > span, .perk-pill > span { overflow: hidden; text-overflow: ellipsis; }
+.perk { position: absolute; left: 12px; bottom: 12px; max-width: calc(100% - 24px); }
+.glance .perk-pill { height: 24px; min-height: 0; padding: 0 10px 0 8px; font-size: 11.5px; border-radius: 6px; }
+.rail-text .perk-pill { height: 28px; font-size: 12px; }
+
+.head-row { justify-content: flex-start; align-items: center; }
+.head-row .chips { align-items: center; gap: 10px; }
+.perk-badge { display: inline-flex; align-items: center; gap: 12px; height: 38px; padding: 0 18px 0 14px; border-radius: 8px; background: var(--gold); color: #fff; white-space: nowrap; }
+.perk-badge svg { width: 24px; height: auto; flex: none; }
+.perk-badge-label { font-family: var(--body); font-size: 10.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; padding-right: 12px; border-right: 1px solid rgba(255, 255, 255, 0.45); line-height: 18px; }
+.perk-badge-text { font-size: 14.5px; font-weight: 500; }
+
 @media (max-width: 900px) {
   :root { --gutter: 16px; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -668,7 +688,12 @@ section > .wrap > .occasion-row:first-child { border-top: 1px solid var(--line);
   .ideator-controls { padding: 12px 20px 28px; }
   .guide-row a.pic { margin: 14px; height: auto; }
   .perk-block { align-items: flex-start; }
-  .perk, .perk-pill { white-space: normal; padding: 6px 13px; }
+  .perk, .perk-pill { height: 24px; padding: 0 9px 0 7px; font-size: 11px; gap: 6px; }
+  .perk svg, .perk-pill svg { width: 13px; }
+  .perk { left: 8px; bottom: 8px; max-width: calc(100% - 16px); }
+  .tile-img .perk { left: 0; right: 0; bottom: 0; max-width: none; height: 24px; padding: 0 8px; border-radius: 0; justify-content: center; font-size: 10.5px; }
+  .tile-img .perk svg { display: none; }
+  .perk-badge { height: auto; min-height: 38px; padding: 8px 14px 8px 12px; white-space: normal; flex-wrap: wrap; gap: 6px 10px; }
   .edit-strip a { padding: 12px 12px 18px; }
   .rail-sec { padding-top: 48px; }
   .rail-nav .rail-btn { display: none; }

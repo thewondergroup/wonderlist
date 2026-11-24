@@ -153,7 +153,7 @@
         return '<button type="button" class="chip" data-r="' + group + '" data-value="' + esc(v) + '" aria-pressed="' + (group === 'occ' && v === 'Romantic') + '">' + esc(v) + '</button>';
       }).join('') + '</div>';
   }
-  function perkPill(text) { return '<span class="perk-pill">' + esc(text) + '</span>'; }
+  function perkPill(text) { return '<span class="perk-pill">' + logo() + '<span>' + esc(text) + '</span></span>'; }
   function num(i) { return (i < 9 ? '0' : '') + (i + 1); }
 
   function placeCard(ctx, data, p) {
@@ -161,7 +161,7 @@
     return '<div class="cell card" data-card data-category="' + esc(p.category) + '" data-area="' + esc(p.area) + '" data-price="' + esc(p.price) + '" data-perk="' + (p.perk ? 'yes' : '') + '" data-occasions="' + esc(p.occasions.join('|')) + '" data-text="' + esc(text) + '">' + saveButton(p) +
       '<a class="tile" href="' + ctx.link('place', p.slug) + '">' +
       '<div class="tile-img"><img src="' + ctx.img(p.image) + '" alt="' + esc(p.name) + ', ' + esc(p.descriptor.toLowerCase()) + ' in ' + esc(p.area) + '" loading="lazy">' +
-      (p.perk ? '<span class="perk">' + esc(p.perk) + '</span>' : '') + '</div>' +
+      (p.perk ? '<span class="perk">' + logo() + '<span>' + esc(p.perk) + '</span></span>' : '') + '</div>' +
       '<h3>' + esc(p.name) + '</h3>' +
       '<p class="tile-sub">' + esc(p.descriptor) + '</p>' +
       '<div class="tile-meta"><span>' + esc(p.area) + '</span><span>' + esc(p.price || catOf(data, p.category).singular) + '</span></div>' +
@@ -361,8 +361,8 @@
     return '<div class="wrap">' + crumbs(meta.crumbs) +
       '<header class="place-head"><p class="kicker">' + esc(cat.singular) + ' · ' + esc(p.area) + ', ' + esc(p.city) + '</p>' +
       '<h1>' + esc(p.name) + '</h1>' +
-      '<div class="head-row"><div class="chips"><a class="chip" href="' + ctx.link('area', area.slug) + '">' + esc(p.area) + '</a><span class="chip">' + esc(p.descriptor) + '</span><span class="chip">' + esc(p.price) + '</span></div>' +
-      (p.perk ? '<div class="perk-block"><span class="perk-label">' + logo() + 'Gold Card perk</span>' + perkPill(p.perk) + '</div>' : '') + '</div>' +
+      '<div class="head-row"><div class="chips"><a class="chip" href="' + ctx.link('area', area.slug) + '">' + esc(p.area) + '</a><span class="chip">' + esc(p.descriptor) + '</span><span class="chip">' + esc(p.price) + '</span>' +
+      (p.perk ? '<span class="perk-badge">' + logo() + '<span class="perk-badge-label">Gold Card perk</span><span class="perk-badge-text">' + esc(p.perk) + '</span></span>' : '') + '</div></div>' +
       '<p class="verdict">' + esc(p.verdict) + '</p>' +
       '<div><button type="button" class="btn btn-sm save-btn" data-save="' + esc(p.slug) + '" aria-pressed="false"><span data-save-label>Save to My List</span></button></div></header>' +
       '<div class="grid place-grid">' +
@@ -419,7 +419,7 @@
     meta.list = list;
     var rows = list.map(function (p, i) {
       var pic = '<div class="cell span-2 guide-row' + (i % 2 ? ' flip' : '') + '"><a class="pic" href="' + ctx.link('place', p.slug) + '"><img src="' + ctx.img(p.image) + '" alt="' + esc(p.name) + '" loading="lazy">' +
-        (p.perk ? '<span class="perk">' + esc(p.perk) + '</span>' : '') + '</a></div>';
+        (p.perk ? '<span class="perk">' + logo() + '<span>' + esc(p.perk) + '</span></span>' : '') + '</a></div>';
       var text = '<div class="cell span-2 guide-row-text"><div class="guide-num"><span>' + num(i) + '</span><p class="kicker">' + esc(p.area) + ' · ' + esc(p.descriptor) + ' · ' + esc(p.price) + '</p></div>' +
         '<h2>' + esc(p.name) + '</h2><p class="verdict">' + esc(p.verdict) + '</p>' +
         '<p class="guide-body">' + esc(p.description[0]) + '</p>' +
