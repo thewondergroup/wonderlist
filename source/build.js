@@ -22,6 +22,7 @@ data.places.forEach((p) => {
   [p.image].concat(p.gallery || []).forEach((i) => { if (!images.has(i)) problems.push(`${p.slug}: missing image ${i}`); });
   if (!areaNames.has(p.area)) problems.push(`${p.slug}: area "${p.area}" is not in areas.json`);
   p.occasions.forEach((o) => { if (!data.site.occasions.includes(o)) problems.push(`${p.slug}: unknown occasion ${o}`); });
+  (p.features || []).forEach((f) => { if (!(data.site.features || []).some((x) => x.id === f)) problems.push(`${p.slug}: unknown feature ${f}`); });
 });
 data.guides.forEach((g) => {
   if (!images.has(g.image)) problems.push(`${g.slug}: missing image ${g.image}`);
@@ -172,7 +173,8 @@ const pages = [
   .concat(data.guides.map((g) => ({ file: `guides/${g.slug}.html`, route: { name: 'guide', slug: g.slug }, lastmod: g.updated })))
   .concat(data.site.categories.map((c) => ({ file: `london/${c.slug}.html`, route: { name: 'category', slug: c.slug } })))
   .concat(WL.liveAreas(data).map((a) => ({ file: `london/${a.slug}.html`, route: { name: 'area', slug: a.slug } })))
-  .concat(WL.liveOccasions(data).map((o) => ({ file: `london/${WL.slugify(o)}.html`, route: { name: 'occasion', slug: WL.slugify(o) } })));
+  .concat(WL.liveOccasions(data).map((o) => ({ file: `london/${WL.slugify(o)}.html`, route: { name: 'occasion', slug: WL.slugify(o) } })))
+  .concat(WL.liveFeatures(data).map((f) => ({ file: `london/${f.slug}.html`, route: { name: 'feature', slug: f.slug } })));
 
 const INDEXABLE = data.site.indexable !== false;
 function buildStatic(dist) {

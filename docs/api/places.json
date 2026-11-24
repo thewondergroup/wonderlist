@@ -45,7 +45,15 @@
     "bestTable": "The corner banquettes, directly under the painted ceiling.",
     "when": "Book the late sitting. The room is at its best after nine.",
     "dress": "Smart. Jackets welcome, trainers less so.",
-    "address": ""
+    "address": "",
+    "features": [
+      "Private dining",
+      "Late night"
+    ],
+    "bookAhead": "Two to three weeks for a weekend table. Midweek is easier.",
+    "walkIns": "No. The bar takes walk-ins for a drink.",
+    "perHead": "About £120 a head with wine",
+    "privateDining": "One room at the back, for up to 14."
   },
   {
     "slug": "scotts",
@@ -87,7 +95,15 @@
     "bestTable": "",
     "when": "",
     "dress": "",
-    "address": ""
+    "address": "",
+    "features": [
+      "Terrace",
+      "Counter seats"
+    ],
+    "bookAhead": "",
+    "walkIns": "",
+    "perHead": "",
+    "privateDining": ""
   },
   {
     "slug": "fallow",
@@ -128,7 +144,14 @@
     "bestTable": "",
     "when": "",
     "dress": "",
-    "address": ""
+    "address": "",
+    "features": [
+      "Counter seats"
+    ],
+    "bookAhead": "",
+    "walkIns": "",
+    "perHead": "",
+    "privateDining": ""
   },
   {
     "slug": "house-of-ming",
@@ -170,7 +193,14 @@
     "bestTable": "",
     "when": "",
     "dress": "",
-    "address": ""
+    "address": "",
+    "features": [
+      "Private dining"
+    ],
+    "bookAhead": "",
+    "walkIns": "",
+    "perHead": "",
+    "privateDining": ""
   },
   {
     "slug": "saltie-girl",
@@ -209,7 +239,12 @@
     "bestTable": "",
     "when": "",
     "dress": "",
-    "address": ""
+    "address": "",
+    "features": [],
+    "bookAhead": "",
+    "walkIns": "",
+    "perHead": "",
+    "privateDining": ""
   },
   {
     "slug": "ottos",
@@ -250,7 +285,12 @@
     "bestTable": "",
     "when": "",
     "dress": "",
-    "address": ""
+    "address": "",
+    "features": [],
+    "bookAhead": "",
+    "walkIns": "",
+    "perHead": "",
+    "privateDining": ""
   },
   {
     "slug": "delamina",
@@ -291,7 +331,12 @@
     "bestTable": "",
     "when": "",
     "dress": "",
-    "address": ""
+    "address": "",
+    "features": [],
+    "bookAhead": "",
+    "walkIns": "",
+    "perHead": "",
+    "privateDining": ""
   },
   {
     "slug": "bar-wonder",
@@ -331,7 +376,15 @@
     "bestTable": "The two stools at the end of the bar.",
     "when": "Before dinner, while it is still quiet.",
     "dress": "Smart.",
-    "address": ""
+    "address": "",
+    "features": [
+      "Late night",
+      "Counter seats"
+    ],
+    "bookAhead": "A day or two. Tables for two are held for members.",
+    "walkIns": "Yes, at the bar, before seven.",
+    "perHead": "About £22 a cocktail",
+    "privateDining": ""
   },
   {
     "slug": "the-night-list",
@@ -371,7 +424,14 @@
     "bestTable": "The booth beside the DJ.",
     "when": "After eleven.",
     "dress": "Whatever you wore to dinner.",
-    "address": ""
+    "address": "",
+    "features": [
+      "Late night"
+    ],
+    "bookAhead": "Book a table by Thursday for the weekend.",
+    "walkIns": "After midnight, if there is room.",
+    "perHead": "About £18 a cocktail",
+    "privateDining": "The back booth, for up to 10."
   },
   {
     "slug": "the-wonder-rooms",
@@ -412,6 +472,13 @@
     "bestTable": "Ask for a room at the back, over the garden.",
     "when": "Sunday nights are the quietest.",
     "dress": "",
-    "address": ""
+    "address": "",
+    "features": [
+      "Terrace"
+    ],
+    "bookAhead": "A month for weekends.",
+    "walkIns": "",
+    "perHead": "Rooms from about £420 a night",
+    "privateDining": ""
   }
 ]

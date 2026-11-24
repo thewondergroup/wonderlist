@@ -629,6 +629,35 @@ section > .wrap > .occasion-row:first-child { border-top: 1px solid var(--line);
 @media (max-width: 1240px) { .nav { gap: 20px; font-size: 13.5px; } .nav-r .btn { display: none; } }
 @media (max-width: 1080px) { .nav-l a[href*="london"], .nav-l a[href*="category-"] { display: none; } }
 
+
+/* ---------- Map, evening plan ---------- */
+.map-wrap { border: 1px solid var(--line); border-bottom: 0; padding: 18px 22px 16px; background: radial-gradient(ellipse at 50% 40%, #17140f 0%, var(--bg) 70%); }
+.area-map { display: block; width: 100%; height: auto; max-height: 520px; }
+.map-park { fill: rgba(172, 150, 126, 0.07); stroke: rgba(172, 150, 126, 0.22); stroke-width: 1; }
+.map-river { fill: none; stroke: rgba(172, 150, 126, 0.5); stroke-width: 15; stroke-linecap: round; opacity: 0.5; }
+.map-road { fill: none; stroke: rgba(244, 240, 234, 0.16); stroke-width: 1.2; }
+.map-note { font-family: var(--body); font-size: 10px; font-weight: 500; letter-spacing: 0.22em; fill: rgba(244, 240, 234, 0.34); }
+.map-node { cursor: pointer; outline: none; }
+.map-ring { fill: rgba(172, 150, 126, 0.12); stroke: var(--gold); stroke-width: 1; transition: fill 0.25s; }
+.map-dot { fill: var(--bg); stroke: var(--gold); stroke-width: 1.5; transition: fill 0.25s; }
+.map-count { font-family: var(--body); font-size: 13px; font-weight: 600; fill: #fff; pointer-events: none; }
+.map-label { font-family: var(--display); font-size: 17px; letter-spacing: 0.16em; fill: var(--text); pointer-events: none; transition: fill 0.25s; }
+.map-node:hover .map-ring, .map-node:focus-visible .map-ring { fill: rgba(172, 150, 126, 0.3); }
+.map-node:hover .map-label { fill: var(--gold); }
+.map-node[aria-pressed="true"] .map-dot { fill: var(--gold); }
+.map-node[aria-pressed="true"] .map-ring { fill: rgba(172, 150, 126, 0.36); }
+.map-node[aria-pressed="true"] .map-label { fill: var(--gold); }
+.map-wrap .note { margin-top: 6px; }
+
+.plan-cell { background: var(--surface); }
+.plan-list { list-style: none; margin: 0 0 18px; padding: 0; display: grid; }
+.plan-list li { display: grid; grid-template-columns: 74px 1fr; gap: 10px; align-items: baseline; padding: 13px 0; border-top: 1px solid var(--line); }
+.plan-list li:last-child { border-bottom: 1px solid var(--line); }
+.plan-time { font-family: var(--display); font-style: italic; font-size: 19px; color: var(--gold); white-space: nowrap; }
+.plan-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+.plan-actions .btn { padding: 0 14px; letter-spacing: 0.12em; }
+.plan-cell .form-msg { margin-top: 10px; min-height: 0; }
+
 @media (max-width: 900px) {
   :root { --gutter: 16px; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -756,6 +785,11 @@ section > .wrap > .occasion-row:first-child { border-top: 1px solid var(--line);
   .menu { max-height: calc(100vh - 76px - 56px); }
   .menu-grid { grid-template-columns: 1fr; border-left: 0; margin: 0 calc(var(--gutter) * -1); }
   .menu-col { padding: 22px var(--gutter) 24px; border-right: 0; }
+  .map-wrap { padding: 10px 8px 12px; }
+  .map-label { font-size: 19px; letter-spacing: 0.1em; }
+  .map-count { font-size: 18px; }
+  .map-note { font-size: 13px; }
+  .plan-cell { grid-column: 1 / -1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

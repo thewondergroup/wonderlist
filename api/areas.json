@@ -2,31 +2,43 @@
   {
     "slug": "mayfair",
     "name": "Mayfair",
-    "intro": "London's grandest dining rooms, hotel bars and members' clubs, between Hyde Park and Regent Street."
+    "intro": "London's grandest dining rooms, hotel bars and members' clubs, between Hyde Park and Regent Street.",
+    "x": 410,
+    "y": 292
   },
   {
     "slug": "soho",
     "name": "Soho",
-    "intro": "Late nights, small rooms and the best people-watching in town."
+    "intro": "Late nights, small rooms and the best people-watching in town.",
+    "x": 545,
+    "y": 252
   },
   {
     "slug": "marylebone",
     "name": "Marylebone",
-    "intro": "A village in the middle of the city, with neighbourhood restaurants and quiet townhouse hotels."
+    "intro": "A village in the middle of the city, with neighbourhood restaurants and quiet townhouse hotels.",
+    "x": 400,
+    "y": 168
   },
   {
     "slug": "st-jamess",
     "name": "St James's",
-    "intro": "Old London at its smartest, from the theatres of Haymarket to the clubs of Pall Mall."
+    "intro": "Old London at its smartest, from the theatres of Haymarket to the clubs of Pall Mall.",
+    "x": 520,
+    "y": 352
   },
   {
     "slug": "victoria",
     "name": "Victoria",
-    "intro": "Hotel dining rooms and new openings a short walk from the palace."
+    "intro": "Hotel dining rooms and new openings a short walk from the palace.",
+    "x": 432,
+    "y": 452
   },
   {
     "slug": "holborn",
     "name": "Holborn",
-    "intro": "Between the West End and the City, with old-school dining rooms worth the detour."
+    "intro": "Between the West End and the City, with old-school dining rooms worth the detour.",
+    "x": 690,
+    "y": 222
   }
 ]

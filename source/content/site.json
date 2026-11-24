@@ -87,5 +87,31 @@
     "Lavish": "lavish places",
     "Calm": "calm places"
   },
-  "indexable": false
+  "indexable": false,
+  "features": [
+    {
+      "id": "Private dining",
+      "slug": "private-dining",
+      "title": "Private dining rooms in London",
+      "intro": "Rooms with a door you can close, for birthdays, deals and dinners that run late."
+    },
+    {
+      "id": "Late night",
+      "slug": "late-night",
+      "title": "Late-night places in London",
+      "intro": "Where the kitchen, the bar or both are still going after eleven."
+    },
+    {
+      "id": "Counter seats",
+      "slug": "counter-seats",
+      "title": "Counter and bar seats in London",
+      "intro": "The best seat is often the one facing the kitchen or the barman."
+    },
+    {
+      "id": "Terrace",
+      "slug": "terraces",
+      "title": "Terraces and gardens in London",
+      "intro": "Tables outside, for the few weeks a year London allows it, and heaters for the rest."
+    }
+  ]
 }

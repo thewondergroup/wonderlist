@@ -35,7 +35,7 @@
         if (route === 'home') return base + 'index.html';
         if (route === 'place') return base + 'places/' + slug + '.html';
         if (route === 'guide') return base + 'guides/' + slug + '.html';
-        if (route === 'area' || route === 'occasion' || route === 'category') return base + 'london/' + slug + '.html';
+        if (route === 'area' || route === 'occasion' || route === 'category' || route === 'feature') return base + 'london/' + slug + '.html';
         return base + route + '.html';
       }
     };
@@ -64,6 +64,14 @@
   }
   function liveOccasions(data) {
     return data.site.occasions.filter(function (o) { return data.places.some(function (p) { return p.occasions.indexOf(o) >= 0; }); });
+  }
+  function liveFeatures(data) {
+    return (data.site.features || []).filter(function (f) { return data.places.some(function (p) { return (p.features || []).indexOf(f.id) >= 0; }); });
+  }
+  function featureLinks(ctx, data) {
+    return '<div class="chips">' + liveFeatures(data).map(function (f) {
+      return '<a class="chip" href="' + ctx.link('feature', f.slug) + '">' + esc(f.id) + '</a>';
+    }).join('') + '</div>';
   }
   function fillers(count) {
     var n = (4 - (count % 4)) % 4, out = '';
@@ -126,6 +134,7 @@
       lists.map(function (g) { return '<a href="' + ctx.link('guide', g.slug) + '"><span>' + esc(g.title) + '</span></a>'; }).join('') +
       '<a href="' + ctx.link('guides') + '"><span>All guides</span></a></div></div>' +
       '<div class="cell menu-col"><p class="label-sm">By occasion</p>' + occasionLinks(ctx, data) +
+      '<p class="label-sm menu-gap">Looking for</p>' + featureLinks(ctx, data) +
       '<p class="label-sm menu-gap">Yours</p><div class="menu-links"><a href="' + ctx.link('my-list') + '"><span>My List</span><small data-save-count></small></a></div>' +
       '<a class="menu-gold" href="' + ctx.link('gold') + '">' + logo() + '<span><strong>The Gold Card</strong><small>A perk at every visit. Join the list.</small></span></a></div>' +
       '</div></div></div>';
@@ -200,7 +209,7 @@
 
   function placeCard(ctx, data, p) {
     var text = [p.name, p.area, p.descriptor, p.cuisine].concat(p.tags, p.occasions).join(' ').toLowerCase();
-    return '<div class="cell card" data-card data-category="' + esc(p.category) + '" data-area="' + esc(p.area) + '" data-price="' + esc(p.price) + '" data-perk="' + (p.perk ? 'yes' : '') + '" data-occasions="' + esc(p.occasions.join('|')) + '" data-text="' + esc(text) + '">' + saveButton(p) +
+    return '<div class="cell card" data-card data-category="' + esc(p.category) + '" data-area="' + esc(p.area) + '" data-price="' + esc(p.price) + '" data-perk="' + (p.perk ? 'yes' : '') + '" data-occasions="' + esc(p.occasions.join('|')) + '" data-features="' + esc((p.features || []).join('|')) + '" data-text="' + esc(text) + '">' + saveButton(p) +
       '<a class="tile" href="' + ctx.link('place', p.slug) + '">' +
       '<div class="tile-img"><img src="' + ctx.img(p.image) + '" alt="' + esc(p.name) + ', ' + esc(p.descriptor.toLowerCase()) + ' in ' + esc(p.area) + '" loading="lazy">' +
       (p.perk ? '<span class="perk">' + logo() + '<span>' + esc(p.perk) + '</span></span>' : '') + '</div>' +
@@ -359,6 +368,25 @@
       '</div></section>';
   }
 
+  /* A drawn map of central London. Each area is a button that filters the list below it. */
+  function areaMap(data) {
+    var nodes = liveAreas(data).filter(function (a) { return a.x; }).map(function (a) {
+      var n = data.places.filter(function (p) { return p.area === a.name; }).length;
+      return '<g class="map-node" data-map-area="' + esc(a.name) + '" role="button" tabindex="0" aria-pressed="false" aria-label="' + esc(a.name) + ', ' + plural(n, 'place') + '">' +
+        '<circle class="map-ring" cx="' + a.x + '" cy="' + a.y + '" r="' + (20 + n * 5) + '"/><circle class="map-dot" cx="' + a.x + '" cy="' + a.y + '" r="15"/>' +
+        '<text class="map-count" x="' + a.x + '" y="' + (a.y + 5) + '" text-anchor="middle">' + n + '</text>' +
+        '<text class="map-label" x="' + a.x + '" y="' + (a.y - 30 - n * 5) + '" text-anchor="middle">' + esc(a.name.toUpperCase()) + '</text></g>';
+    }).join('');
+    return '<div class="map-wrap"><svg class="area-map" viewBox="0 0 1000 560" role="group" aria-label="Map of central London. Choose an area to filter the list.">' +
+      '<ellipse class="map-park" cx="430" cy="62" rx="118" ry="52"/><text class="map-note" x="430" y="66" text-anchor="middle">REGENT’S PARK</text>' +
+      '<rect class="map-park" x="118" y="252" width="212" height="112" rx="26"/><text class="map-note" x="224" y="312" text-anchor="middle">HYDE PARK</text>' +
+      '<path class="map-park" d="M452 392 L560 372 L592 412 L470 432 Z"/>' +
+      '<path class="map-river" d="M300 560 C420 524 566 522 606 440 C632 384 640 342 704 316 C786 290 880 302 1000 300"/><text class="map-note" x="770" y="342">RIVER THAMES</text>' +
+      '<path class="map-road" d="M296 226 L660 226"/><text class="map-note" x="304" y="218">OXFORD STREET</text>' +
+      '<path class="map-road" d="M486 226 L524 312"/><path class="map-road" d="M352 338 L566 300"/><text class="map-note" x="356" y="358">PICCADILLY</text>' +
+      nodes + '</svg><p class="note">Tap an area on the map to see its places.</p></div>';
+  }
+
   function places(ctx, data) {
     function row(label, group, values) {
       return '<div class="filter-row"><span>' + label + '</span><div class="chips">' +
@@ -369,11 +397,13 @@
     }
     return '<div class="wrap"><div class="page-head"><p class="kicker">The list · ' + esc(data.site.city) + '</p><h1>Places</h1>' +
       '<p class="lede">Every restaurant, bar and hotel on The Wonder List. Gold Card perks are marked on each place.</p></div>' +
+      areaMap(data) +
       '<div class="filters" data-filters>' +
       '<div class="filter-row"><label for="place-search">Search</label><input id="place-search" class="search" type="search" placeholder="Name, area, cuisine or mood" data-search autocomplete="off"></div>' +
       row('Category', 'category', data.site.categories) +
       row('Area', 'area', liveAreas(data).map(function (a) { return { id: a.name, label: a.name }; })) +
       row('Occasion', 'occasions', liveOccasions(data).map(function (o) { return { id: o, label: o }; })) +
+      row('Looking for', 'features', liveFeatures(data).map(function (f) { return { id: f.id, label: f.id }; })) +
       row('Price', 'price', ['££', '£££', '££££'].map(function (v) { return { id: v, label: v }; })) +
       row('Gold perk', 'perk', [{ id: 'yes', label: 'With a Gold Card perk' }]) +
       '</div>' +
@@ -418,7 +448,10 @@
       fact('Address', esc(p.address)) +
       fact('Nearest station', esc(p.station)) +
       fact('Type', '<a href="' + ctx.link('category', cat.slug) + '">' + esc(cat.singular) + '</a>' + (p.cuisine ? ', ' + esc(p.cuisine) : '')) +
-      fact('Price', esc(p.price)) +
+      fact('Price', esc(p.price) + (p.perHead ? ' · ' + esc(p.perHead) : '')) +
+      fact('Book ahead', esc(p.bookAhead)) +
+      fact('Walk-ins', esc(p.walkIns)) +
+      fact('Private dining', esc(p.privateDining)) +
       fact('Open', esc(p.hours)) +
       fact('Dress', esc(p.dress)) +
       fact('Good for', p.occasions.map(function (o) { return '<a href="' + ctx.link('occasion', slugify(o)) + '">' + esc(o) + '</a>'; }).join(', ')) +
@@ -432,7 +465,10 @@
       '</div>' +
       '<div class="cell ' + (tips.length ? 'span-2' : 'span-4') + ' review"><p class="label-sm">The review</p>' +
       '<div class="prose dropcap">' + p.description.map(function (d) { return '<p>' + esc(d) + '</p>'; }).join('') + '</div>' +
-      '<div class="chips">' + p.tags.map(function (tg) { return '<span class="chip">' + esc(tg) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="chips">' + (p.features || []).map(function (f) {
+        var def = liveFeatures(data).filter(function (x) { return x.id === f; })[0];
+        return def ? '<a class="chip" href="' + ctx.link('feature', def.slug) + '">' + esc(f) + '</a>' : '';
+      }).join('') + p.tags.map(function (tg) { return '<span class="chip">' + esc(tg) + '</span>'; }).join('') + '</div></div>' +
       (tips.length ? '<div class="cell span-2 insider"><p class="label-sm">From the editors</p>' + tips.map(function (x) {
         return '<div><h3>' + x[0] + '</h3><p>' + esc(x[1]) + '</p></div>';
       }).join('') + '</div>' : '') +
@@ -502,6 +538,7 @@
       '<section><div class="wrap"><div class="occasion-row"><span class="caps">More ways to browse</span><div class="chips">' +
       liveAreas(data).map(function (a) { return '<a class="chip" href="' + ctx.link('area', a.slug) + '">' + esc(a.name) + '</a>'; }).join('') +
       liveOccasions(data).map(function (oc) { return '<a class="chip" href="' + ctx.link('occasion', slugify(oc)) + '">' + esc(oc) + '</a>'; }).join('') +
+      liveFeatures(data).map(function (f) { return '<a class="chip" href="' + ctx.link('feature', f.slug) + '">' + esc(f.id) + '</a>'; }).join('') +
       '</div></div></div></section>';
   }
 
@@ -564,7 +601,7 @@
 
   /* ---------- routing and rendering ---------- */
 
-  var PREFIXES = ['place', 'guide', 'area', 'occasion', 'category'];
+  var PREFIXES = ['place', 'guide', 'area', 'occasion', 'category', 'feature'];
   function parse(hash) {
     var h = String(hash || '').replace(/^#/, '');
     if (!h || h === 'home') return { name: 'home' };
@@ -602,6 +639,13 @@
       var occTitle = occLabel.charAt(0).toUpperCase() + occLabel.slice(1) + ' in ' + s.city;
       body = listing(ctx, data, meta, { crumb: occ, kicker: 'What kind of evening?', title: occTitle, intro: s.occasionNotes[occ] || '', list: forOcc, faqLabel: occLabel + ' in ' + s.city });
       title = occTitle + ': restaurants, bars and hotels | ' + s.name; desc = s.occasionNotes[occ] || desc; active = 'places';
+    }
+    else if (route.name === 'feature' && liveFeatures(data).some(function (f) { return f.slug === route.slug; })) {
+      var feature = liveFeatures(data).filter(function (f) { return f.slug === route.slug; })[0];
+      var withFeature = data.places.filter(function (p) { return (p.features || []).indexOf(feature.id) >= 0; });
+      item = { name: feature.id, slug: feature.slug };
+      body = listing(ctx, data, meta, { crumb: feature.id, kicker: 'Looking for', title: feature.title, intro: feature.intro, list: withFeature, faqLabel: lower(feature.title) });
+      title = feature.title + ' | ' + s.name; desc = feature.intro; active = 'places';
     }
     else if (route.name === 'category' && s.categories.some(function (c) { return c.slug === route.slug; })) {
       var cat = s.categories.filter(function (c) { return c.slug === route.slug; })[0];
@@ -759,7 +803,7 @@
     // Place search and filters
     var filters = rootEl.querySelector('[data-filters]');
     if (filters) {
-      var state = { category: '', area: '', occasions: '', price: '', perk: '', text: '' };
+      var state = { category: '', area: '', occasions: '', features: '', price: '', perk: '', text: '' };
       var count = rootEl.querySelector('[data-count]'), empty = rootEl.querySelector('[data-empty]');
       var apply = function () {
         var shown = 0, words = state.text.toLowerCase().split(/\s+/).filter(Boolean);
@@ -767,6 +811,7 @@
           var text = card.getAttribute('data-text') || '';
           var ok = (!state.category || card.getAttribute('data-category') === state.category) &&
             (!state.area || card.getAttribute('data-area') === state.area) &&
+            (!state.features || (card.getAttribute('data-features') || '').split('|').indexOf(state.features) >= 0) &&
             (!state.price || card.getAttribute('data-price') === state.price) &&
             (!state.perk || card.getAttribute('data-perk') === state.perk) &&
             (!state.occasions || card.getAttribute('data-occasions').split('|').indexOf(state.occasions) >= 0) &&
@@ -776,6 +821,7 @@
         }, rootEl.querySelector('[data-cards]'));
         count.textContent = plural(shown, 'place');
         empty.hidden = shown > 0;
+        each('[data-map-area]', function (node) { node.setAttribute('aria-pressed', String(node.getAttribute('data-map-area') === state.area)); });
       };
       each('[data-filter]', function (btn) {
         btn.addEventListener('click', function () {
@@ -785,6 +831,15 @@
           apply();
         });
       }, filters);
+      each('[data-map-area]', function (node) {
+        var pick = function () {
+          var name = node.getAttribute('data-map-area');
+          var btn = filters.querySelector('[data-filter="area"][data-value="' + (state.area === name ? '' : name) + '"]');
+          if (btn) btn.click();
+        };
+        node.addEventListener('click', pick);
+        node.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+      });
       var search = filters.querySelector('[data-search]');
       if (search) search.addEventListener('input', function () { state.text = search.value; apply(); });
     }
@@ -810,12 +865,30 @@
         var occs = [];
         each('[data-r="occ"][aria-pressed="true"]', function (b) { occs.push(b.getAttribute('data-value')); }, r);
         var plan = planEvening(data, area, occs);
+        var times = ['7.00pm', '8.00pm', '10.30pm'];
         out.innerHTML = plan.stops.map(function (s) {
           return placeCard(ctx, data, s.place).replace('<a class="tile"', '<p class="slot-label">' + s.label + '</p><a class="tile"');
         }).join('') +
-          '<div class="cell card"><div class="tile cta-tile"><p class="kicker">Not quite right?</p>' +
-          '<h3>Spin again for a new plan</h3>' +
-          '<div><button type="button" class="btn btn-sm" data-again>Spin again</button></div></div></div>';
+          '<div class="cell card plan-cell"><p class="slot-label">Your evening</p><ol class="plan-list">' +
+          plan.stops.map(function (s, i) {
+            return '<li><span class="plan-time">' + times[i] + '</span><span><span class="mini-name">' + esc(s.place.name) + '</span><span class="mini-meta">' + esc(s.label) + ' · ' + esc(s.place.area) + (s.place.perk ? ' · ' + esc(s.place.perk) : '') + '</span></span></li>';
+          }).join('') + '</ol>' +
+          '<div class="plan-actions"><button type="button" class="btn btn-sm btn-fill" data-save-all>Save all three</button>' +
+          '<button type="button" class="btn btn-sm" data-copy-plan>Copy the plan</button>' +
+          '<button type="button" class="btn btn-sm" data-again>Spin again</button></div>' +
+          '<p class="form-msg" data-plan-msg role="status" aria-live="polite"></p></div>';
+        var msg = out.querySelector('[data-plan-msg]');
+        out.querySelector('[data-save-all]').addEventListener('click', function () {
+          var saved = readSaved();
+          plan.stops.forEach(function (s) { if (saved.indexOf(s.place.slug) < 0) saved.push(s.place.slug); });
+          writeSaved(saved); paintSaved();
+          msg.textContent = 'All three are in My List.';
+        });
+        out.querySelector('[data-copy-plan]').addEventListener('click', function () {
+          var text = 'My evening, planned by The Wonder List\n' + plan.stops.map(function (s, i) { return times[i] + '  ' + s.label + ': ' + s.place.name + ', ' + s.place.area; }).join('\n');
+          var fail = function () { msg.textContent = 'Copying is not available here. Save all three instead.'; };
+          try { navigator.clipboard.writeText(text).then(function () { msg.textContent = 'Plan copied. Paste it into a message.'; }, fail); } catch (e) { fail(); }
+        });
         note.textContent = (occs.length ? occs.join(' and ') : 'Any occasion') + (area ? ', starting in ' + area : ', anywhere in ' + data.site.city) +
           (plan.exact ? '' : '. Closest matches shown.');
         var again = out.querySelector('[data-again]');
@@ -868,5 +941,5 @@
     go();
   }
 
-  return { makeCtx: makeCtx, render: render, parse: parse, mount: mount, start: start, planEvening: planEvening, slugify: slugify, liveAreas: liveAreas, liveOccasions: liveOccasions };
+  return { makeCtx: makeCtx, render: render, parse: parse, mount: mount, start: start, planEvening: planEvening, slugify: slugify, liveAreas: liveAreas, liveOccasions: liveOccasions, liveFeatures: liveFeatures };
 });
