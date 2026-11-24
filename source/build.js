@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-/* Builds The Wonder List from the files in content/.
-   docs/     static site, one HTML page per place, guide, area, occasion and category (GitHub Pages serves this folder)
-   preview/  single-page, hash-routed copy of the same site for sharing as a preview
-   Both include api/*.json, the feed the app can read. */
+/* Builds The Wonder List from the files in source/content/.
+   The finished site is written to the top level of the repository, which is where GitHub Pages serves it from,
+   and to docs/ as a spare copy for a Pages setup that points at that folder.
+   source/preview/ is a single-page, hash-routed copy for sharing as a preview.
+   Each copy includes api/*.json, the feed the app can read. */
 const fs = require('fs');
 const path = require('path');
 const WL = require('./src/site.js');
@@ -124,8 +125,15 @@ function write(file, text) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, text);
 }
+// Only ever remove what the build itself writes, so the repository's own files are safe.
+const GENERATED = ['img', 'css', 'js', 'fonts', 'api', 'video', 'places', 'guides', 'london', 'sitemap.xml', 'robots.txt', 'feed.xml', '.nojekyll'];
+function clean(out) {
+  if (!fs.existsSync(out)) return;
+  GENERATED.forEach((n) => fs.rmSync(path.join(out, n), { recursive: true, force: true }));
+  fs.readdirSync(out).filter((f) => f.endsWith('.html')).forEach((f) => fs.rmSync(path.join(out, f)));
+}
 function copyShared(out, inlineFonts) {
-  fs.rmSync(out, { recursive: true, force: true });
+  clean(out);
   fs.mkdirSync(path.join(out, 'img'), { recursive: true });
   images.forEach((i) => fs.copyFileSync(path.join(root, 'assets/img', i), path.join(out, 'img', i)));
   // Reel videos, when there are any, live in assets/video and are copied as they are.
@@ -147,8 +155,6 @@ function copyShared(out, inlineFonts) {
 }
 
 /* ---- static site ---- */
-const dist = path.join(root, 'docs');
-copyShared(dist, false);
 const today = new Date().toISOString().slice(0, 10);
 const pages = [
   { file: 'index.html', route: { name: 'home' } },
@@ -165,6 +171,9 @@ const pages = [
   .concat(WL.liveAreas(data).map((a) => ({ file: `london/${a.slug}.html`, route: { name: 'area', slug: a.slug } })))
   .concat(WL.liveOccasions(data).map((o) => ({ file: `london/${WL.slugify(o)}.html`, route: { name: 'occasion', slug: WL.slugify(o) } })));
 
+const INDEXABLE = data.site.indexable !== false;
+function buildStatic(dist) {
+copyShared(dist, false);
 const seen = new Set();
 pages.forEach((pg) => {
   if (seen.has(pg.file)) { console.error('Two pages want the same address: ' + pg.file); process.exit(1); }
@@ -175,7 +184,7 @@ pages.forEach((pg) => {
   const img = out.item && out.item.image ? out.item.image : 'dining-room.jpg';
   write(path.join(dist, pg.file), doc({
     title: out.title, description: out.description, body: out.html, base, url,
-    image: SITE + '/img/' + img, extraHead: structured(out, pg.route, url),
+    image: SITE + '/img/' + img, extraHead: (INDEXABLE ? '' : '<meta name="robots" content="noindex">\n') + structured(out, pg.route, url),
     type: pg.route.name === 'guide' ? 'article' : 'website',
     script: `WL.mount(document, WL_CONTENT, WL.makeCtx('static', '${base}'));`
   }));
@@ -187,7 +196,7 @@ write(path.join(dist, 'sitemap.xml'), '<?xml version="1.0" encoding="UTF-8"?>\n<
 
 // Search engines and AI search crawlers are all welcome. Listing the AI ones by name makes the choice explicit.
 write(path.join(dist, '.nojekyll'), '');
-write(path.join(dist, 'robots.txt'), ['User-agent: *', 'Allow: /', '',
+write(path.join(dist, 'robots.txt'), !INDEXABLE ? 'User-agent: *\nAllow: /\n' : ['User-agent: *', 'Allow: /', '',
   ...['OAI-SearchBot', 'ChatGPT-User', 'GPTBot', 'Claude-SearchBot', 'Claude-User', 'ClaudeBot', 'PerplexityBot', 'Perplexity-User', 'Google-Extended']
     .flatMap((b) => ['User-agent: ' + b, 'Allow: /', '']),
   'Sitemap: ' + SITE + '/sitemap.xml', ''].join('\n'));
@@ -202,6 +211,11 @@ write(path.join(dist, 'feed.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 ${data.guides.map((g) => `<item><title>${esc(g.title)}</title><link>${pageUrl('guides/' + g.slug + '.html')}</link><guid>${pageUrl('guides/' + g.slug + '.html')}</guid><pubDate>${rfc822(g.published)}</pubDate><description>${esc(g.standfirst)}</description></item>`).join('\n')}
 </channel></rss>
 `);
+
+}
+const repo = path.join(root, '..');
+buildStatic(repo);
+buildStatic(path.join(repo, 'docs'));
 
 /* ---- preview (one page, hash routes, fonts inlined) ---- */
 const prev = path.join(root, 'preview');

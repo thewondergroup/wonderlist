@@ -4,7 +4,7 @@ A guide to places of quality and style. Static site, built from a small set of c
 
 ## How it works
 
-Everything on the site comes from four files in `content/`:
+Everything on the site comes from four files in `source/content/`:
 
 | File | What it holds |
 |---|---|
@@ -13,11 +13,13 @@ Everything on the site comes from four files in `content/`:
 | `areas.json` | Neighbourhoods and their introductions |
 | `site.json` | Site name, categories, occasions, Gold Card copy, Instagram and contact details |
 
-Run the build and it writes the finished site into `docs/`:
+Run the build and it writes the finished site to the top level of this repository, which is where GitHub Pages serves it from:
 
 ```
-node build.js
+node source/build.js
 ```
+
+It also writes a spare copy to `docs/`, for a Pages setup that points at that folder.
 
 No packages to install; it only needs Node.
 
@@ -33,24 +35,26 @@ The build stops with a clear message if a guide points at a place that does not 
 
 The same content is published as plain JSON, so the app can read it and nothing is entered twice:
 
-- `docs/api/places.json`
-- `docs/api/guides.json`
-- `docs/api/areas.json`
-- `docs/api/site.json`
+- `api/places.json`
+- `api/guides.json`
+- `api/areas.json`
+- `api/site.json`
 
 ## Photos and reels
 
-- Photos go in `assets/img/` and are referenced by file name in the content files.
-- Reel videos go in `assets/video/`. Set `"video": "file-name.mp4"` on a guide and it plays in place of the still.
+- Photos go in `source/assets/img/` and are referenced by file name in the content files.
+- Reel videos go in `source/assets/video/`. Set `"video": "file-name.mp4"` on a guide and it plays in place of the still.
 
 ## Putting it live
 
-In the repository settings, open Pages and choose branch `main`, folder `/docs`.
+In the repository settings, open Pages and choose branch `main`, folder `/ (root)`.
 
-Page addresses in the sitemap and in the share tags use the `url` in `content/site.json`. Change it there if the site lives somewhere else.
+Page addresses in the sitemap and in the share tags use the `url` in `source/content/site.json`. Change it there if the site lives somewhere else.
+
+While `"indexable"` is `false` in `source/content/site.json`, every page asks search engines not to list it. Set it to `true` and rebuild when the real content is in.
 
 ## Before it goes public
 
-The venue descriptions, perks and practical details are sample content, and so are three of the venues. Replace them with real, agreed content first. The footer note comes from `sampleNotice` in `content/site.json`.
+The venue descriptions, perks and practical details are sample content, and so are three of the venues. Replace them with real, agreed content first. The footer note comes from `sampleNotice` in `source/content/site.json`.
 
 The waitlist form is not connected to a mailing list yet.
