@@ -1,0 +1,90 @@
+{
+  "name": "The Wonder List",
+  "tagline": "A guide to places of quality and style",
+  "description": "The Wonder List is a guide to the best places to eat, drink and stay. Gold Card members get special access, perks at every visit and monthly gifts.",
+  "url": "https://thewonderlist.app",
+  "instagram": "the.wonder.list",
+  "email": "wonderlist@thewonder.group",
+  "parent": "The Wonder Group",
+  "sampleNotice": "Preview build. Venue details, descriptions and perks are sample content.",
+  "categories": [
+    {
+      "id": "restaurant",
+      "label": "Restaurants",
+      "singular": "Restaurant",
+      "slug": "restaurants",
+      "verb": "Eat"
+    },
+    {
+      "id": "bar",
+      "label": "Bars",
+      "singular": "Bar",
+      "slug": "bars",
+      "verb": "Drink"
+    },
+    {
+      "id": "hotel",
+      "label": "Hotels",
+      "singular": "Hotel",
+      "slug": "hotels",
+      "verb": "Stay"
+    }
+  ],
+  "occasions": [
+    "Smart",
+    "Casual",
+    "Business",
+    "For friends",
+    "Wild",
+    "Romantic",
+    "Impress",
+    "Lavish",
+    "Calm"
+  ],
+  "gold": {
+    "title": "Unlock luxury",
+    "intro": "Champagne on arrival, complimentary cocktails and the best tables in the house. The Wonder List Gold Card opens a world of wonder.",
+    "benefits": [
+      {
+        "title": "A perk at every visit",
+        "text": "Show your Gold Card and be welcomed with something special, from a glass of champagne to a room upgrade."
+      },
+      {
+        "title": "Special access",
+        "text": "Tables held for members, invitations to openings and events, and the use of private members' clubs."
+      },
+      {
+        "title": "Member discounts",
+        "text": "Preferred rates at restaurants, bars, hotels and spas across the list."
+      },
+      {
+        "title": "Monthly gifts",
+        "text": "Every month members have the chance to win gifts, from dinner for two to holidays."
+      }
+    ]
+  },
+  "city": "London",
+  "followers": "70,000",
+  "occasionNotes": {
+    "Smart": "Polished rooms where a jacket never looks out of place.",
+    "Casual": "Easy, cheerful and no dress code.",
+    "Business": "Quiet enough to talk and good enough to close the deal.",
+    "For friends": "Big tables, sharing plates and a second bottle.",
+    "Wild": "Late, loud and worth the morning after.",
+    "Romantic": "Low light, good wine and tables for two.",
+    "Impress": "Rooms and plates that do the talking, for clients, parents and first dates.",
+    "Lavish": "For the nights when the answer to every question is yes.",
+    "Calm": "Unhurried rooms for a quiet night."
+  },
+  "occasionLabels": {
+    "Smart": "smart places",
+    "Casual": "casual places",
+    "Business": "places for business",
+    "For friends": "places to go with friends",
+    "Wild": "places for a wild night",
+    "Romantic": "romantic places",
+    "Impress": "places to impress",
+    "Lavish": "lavish places",
+    "Calm": "calm places"
+  }
+}

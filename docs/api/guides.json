@@ -1,0 +1,118 @@
+[
+  {
+    "slug": "london-december-edit",
+    "type": "edit",
+    "kicker": "The December Edit",
+    "title": "Where to go in London this December",
+    "standfirst": "The must-visit places this month, from a first drink in Mayfair to a long dinner under a painted ceiling.",
+    "image": "dining-room.jpg",
+    "featured": true,
+    "places": [
+      "the-house-of-wonder",
+      "scotts",
+      "bar-wonder",
+      "house-of-ming",
+      "fallow"
+    ],
+    "published": "2026-11-24",
+    "updated": "2026-11-24",
+    "author": "The Wonder List editors",
+    "intro": [
+      "December is the one month when all of London wants the same tables. The trick is to book rooms that feel like an occasion on their own, so the evening is made before the first glass arrives.",
+      "This month's edit starts with a martini in Mayfair and ends, several hours later, under a painted ceiling. Every place below is one we would happily go back to this week, and each has a Gold Card perk waiting when you sit down."
+    ],
+    "caption": "The dining room at The House of Wonder, Mayfair",
+    "video": ""
+  },
+  {
+    "slug": "date-night",
+    "type": "list",
+    "kicker": "Wonder List",
+    "title": "Date night",
+    "standfirst": "Low light, good wine and tables close enough to talk.",
+    "image": "dining-room-tables.jpg",
+    "featured": false,
+    "places": [
+      "the-house-of-wonder",
+      "ottos",
+      "bar-wonder",
+      "the-wonder-rooms"
+    ],
+    "published": "2026-11-24",
+    "updated": "2026-11-24",
+    "author": "The Wonder List editors",
+    "intro": [
+      "A good date needs three things: low light, a table you can talk across and somewhere to go next. These four deliver all three."
+    ],
+    "caption": "",
+    "video": ""
+  },
+  {
+    "slug": "dinner-with-friends",
+    "type": "list",
+    "kicker": "Wonder List",
+    "title": "Dinner with friends",
+    "standfirst": "Big tables, sharing plates and somewhere to go afterwards.",
+    "image": "sauce.jpg",
+    "featured": false,
+    "places": [
+      "fallow",
+      "saltie-girl",
+      "delamina",
+      "the-night-list"
+    ],
+    "published": "2026-11-24",
+    "updated": "2026-11-24",
+    "author": "The Wonder List editors",
+    "intro": [
+      "For the nights when the group chat finally agrees on a date. Big tables, plates built for sharing and a bar nearby for afterwards."
+    ],
+    "caption": "",
+    "video": ""
+  },
+  {
+    "slug": "weekends-away",
+    "type": "list",
+    "kicker": "Wonder List",
+    "title": "Weekends away",
+    "standfirst": "Rooms worth leaving home for, and where to eat when you get there.",
+    "image": "terrace.jpg",
+    "featured": false,
+    "places": [
+      "the-wonder-rooms",
+      "delamina",
+      "house-of-ming"
+    ],
+    "published": "2026-11-24",
+    "updated": "2026-11-24",
+    "author": "The Wonder List editors",
+    "intro": [
+      "Sometimes the best table in town is the one closest to your room. Check in, eat well and do nothing in a hurry."
+    ],
+    "caption": "",
+    "video": ""
+  },
+  {
+    "slug": "the-wonder-list-awards",
+    "type": "awards",
+    "kicker": "The Wonder List Awards",
+    "title": "Our top places of the year",
+    "standfirst": "The rooms, plates and bars our members returned to most.",
+    "image": "private-room.jpg",
+    "featured": false,
+    "places": [
+      "the-house-of-wonder",
+      "house-of-ming",
+      "scotts",
+      "bar-wonder"
+    ],
+    "published": "2026-11-24",
+    "updated": "2026-11-24",
+    "author": "The Wonder List editors",
+    "intro": [
+      "The rooms, plates and bars that defined our year, chosen by The Wonder List editors."
+    ],
+    "caption": "",
+    "video": ""
+  }
+]
