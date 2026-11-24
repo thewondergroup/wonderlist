@@ -92,14 +92,56 @@
   /* ---------- shared pieces ---------- */
 
   function header(ctx, data, active) {
+    var s = data.site;
     function a(route, label, cls) {
       return '<a href="' + ctx.link(route) + '"' + (cls ? ' class="' + cls + '"' : '') + (active === route ? ' aria-current="page"' : '') + '>' + label + '</a>';
     }
+    function cat(c) {
+      return '<a href="' + ctx.link('category', c.slug) + '"' + (active === 'category:' + c.slug ? ' aria-current="page"' : '') + '>' + esc(c.label) + '</a>';
+    }
+    var feat = data.guides.filter(function (g) { return g.featured; })[0] || data.guides[0];
+    var weekly = data.guides.filter(function (g) { return g.type === 'weekly'; })[0];
+    var lists = data.guides.filter(function (g) { return g !== feat && g !== weekly; }).slice(0, 4);
+    function big(href, title, sub, stack) { return '<a class="menu-big' + (stack ? ' menu-stack' : '') + '" href="' + href + '"><span>' + esc(title) + '</span>' + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</a>'; }
+
+    var menu = '<div class="menu" id="site-menu" hidden><div class="wrap"><div class="grid menu-grid">' +
+      '<div class="cell menu-col"><label class="label-sm" for="menu-search">Search the list</label>' +
+      '<input class="search" id="menu-search" type="search" placeholder="A name, an area or a mood" autocomplete="off" data-menu-input>' +
+      '<ul class="menu-results" data-menu-results aria-live="polite"></ul>' +
+      '<p class="label-sm menu-gap">Right now</p>' +
+      (weekly ? big(ctx.link('guide', weekly.slug), weekly.title, weekly.kicker, true) : '') +
+      big(ctx.link('guide', feat.slug), feat.title, feat.kicker, true) +
+      big(ctx.link('roulette'), 'Plan my evening', 'Roulette', true) + '</div>' +
+      '<div class="cell menu-col"><p class="label-sm">Eat, drink, stay</p>' +
+      s.categories.map(function (c) {
+        var n = data.places.filter(function (p) { return p.category === c.id; }).length;
+        return big(ctx.link('category', c.slug), c.label, plural(n, 'place'));
+      }).join('') + big(ctx.link('places'), 'All places', 'Search and filter') + '</div>' +
+      '<div class="cell menu-col"><p class="label-sm">By area</p><div class="menu-links">' +
+      liveAreas(data).map(function (ar) {
+        var n = data.places.filter(function (p) { return p.area === ar.name; }).length;
+        return '<a href="' + ctx.link('area', ar.slug) + '"><span>' + esc(ar.name) + '</span><small>' + n + '</small></a>';
+      }).join('') + '</div>' +
+      '<p class="label-sm menu-gap">Wonder Lists</p><div class="menu-links">' +
+      lists.map(function (g) { return '<a href="' + ctx.link('guide', g.slug) + '"><span>' + esc(g.title) + '</span></a>'; }).join('') +
+      '<a href="' + ctx.link('guides') + '"><span>All guides</span></a></div></div>' +
+      '<div class="cell menu-col"><p class="label-sm">By occasion</p>' + occasionLinks(ctx, data) +
+      '<p class="label-sm menu-gap">Yours</p><div class="menu-links"><a href="' + ctx.link('my-list') + '"><span>My List</span><small data-save-count></small></a></div>' +
+      '<a class="menu-gold" href="' + ctx.link('gold') + '">' + logo() + '<span><strong>The Gold Card</strong><small>A perk at every visit. Join the list.</small></span></a></div>' +
+      '</div></div></div>';
+
     return '<header class="top"><div class="wrap top-in">' +
-      '<nav class="nav nav-l" aria-label="Main">' + a('guides', 'Guides') + a('places', 'Places') + a('roulette', 'Roulette') + '</nav>' +
+      '<button type="button" class="m-btn" data-menu-toggle aria-expanded="false" aria-controls="site-menu">Menu</button>' +
+      '<nav class="nav nav-l" aria-label="Main">' +
+      '<button type="button" class="nav-btn" data-menu-toggle aria-expanded="false" aria-controls="site-menu"><span class="burger" aria-hidden="true"></span>Explore</button>' +
+      s.categories.map(cat).join('') + a('guides', 'Guides') + a('roulette', 'Roulette') + '</nav>' +
       '<a class="brand" href="' + ctx.link('home') + '" aria-label="The Wonder List home">' + logo() + '<span class="wordmark">The Wonder List</span></a>' +
-      '<nav class="nav nav-r" aria-label="Membership">' + a('my-list', 'My List<span class="save-count" data-save-count></span>') + a('gold', 'Gold Card', 'is-gold') + '<a class="btn btn-sm" href="' + ctx.link('gold') + '">Join the list</a></nav>' +
-      '</div></header>' +
+      '<nav class="nav nav-r" aria-label="Membership">' +
+      '<button type="button" class="nav-btn" data-menu-toggle data-menu-search aria-expanded="false" aria-controls="site-menu">' +
+      '<svg class="glass" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>Search</button>' +
+      a('my-list', 'My List<span class="save-count" data-save-count></span>') + a('gold', 'Gold Card', 'is-gold') + '<a class="btn btn-sm" href="' + ctx.link('gold') + '">Join the list</a></nav>' +
+      '<button type="button" class="m-btn m-btn-r" data-menu-toggle data-menu-search aria-expanded="false" aria-controls="site-menu">Search</button>' +
+      '</div>' + menu + '</header>' +
       '<nav class="tabs" aria-label="Sections">' + a('guides', 'Guides') + a('places', 'Places') + a('roulette', 'Roulette') + a('my-list', 'My List') + a('gold', 'Gold', 'is-gold') + '</nav>';
   }
 
@@ -566,7 +608,7 @@
       var ofCat = data.places.filter(function (p) { return p.category === cat.id; });
       item = { name: cat.label, slug: cat.slug };
       body = listing(ctx, data, meta, { crumb: cat.label, kicker: s.city, title: 'The best ' + lower(cat.label) + ' in ' + s.city, intro: 'Every ' + lower(cat.singular) + ' on The Wonder List, each one visited and chosen by our editors.', list: ofCat, faqLabel: lower(cat.label) + ' in ' + s.city });
-      title = 'The best ' + lower(cat.label) + ' in ' + s.city + ' | ' + s.name; desc = 'The ' + lower(cat.label) + ' The Wonder List recommends in ' + s.city + ', with Gold Card perks.'; active = 'places';
+      title = 'The best ' + lower(cat.label) + ' in ' + s.city + ' | ' + s.name; desc = 'The ' + lower(cat.label) + ' The Wonder List recommends in ' + s.city + ', with Gold Card perks.'; active = 'category:' + cat.slug;
     }
     else { body = notFound(ctx); title = 'Not found | ' + s.name; active = ''; meta.kind = 'missing'; }
     return {
@@ -609,6 +651,7 @@
   /* ---------- behaviour ---------- */
 
   var SAVED_FALLBACK = [];
+  var MENU_BOUND = false, CLOSE_MENU = function () {};
 
   function mount(rootEl, data, ctx) {
     var each = function (sel, fn, scope) { Array.prototype.forEach.call((scope || rootEl).querySelectorAll(sel), fn); };
@@ -648,6 +691,54 @@
       });
     }
     paintSaved();
+
+    // Top menu: one panel for browsing and search
+    var menu = rootEl.querySelector('#site-menu');
+    if (menu) {
+      var input = menu.querySelector('[data-menu-input]'), results = menu.querySelector('[data-menu-results]');
+      var setMenu = function (open, focusSearch) {
+        menu.hidden = !open;
+        each('[data-menu-toggle]', function (b) { b.setAttribute('aria-expanded', String(open)); });
+        if (open && focusSearch && input) input.focus();
+      };
+      each('[data-menu-toggle]', function (b) {
+        b.addEventListener('click', function () {
+          var wantSearch = b.hasAttribute('data-menu-search');
+          if (!menu.hidden && wantSearch && document.activeElement !== input) { input.focus(); return; }
+          setMenu(menu.hidden, wantSearch);
+        });
+      });
+      CLOSE_MENU = function () { if (!menu.hidden) setMenu(false); };
+      var find = function (q) {
+        var words = q.toLowerCase().split(/\s+/).filter(Boolean), out = [];
+        if (!words.length) return out;
+        var has = function (text) { text = text.toLowerCase(); return words.every(function (w) { return text.indexOf(w) >= 0; }); };
+        liveAreas(data).forEach(function (ar) { if (has(ar.name)) out.push({ href: ctx.link('area', ar.slug), title: ar.name, sub: 'Area' }); });
+        data.places.forEach(function (p) {
+          if (has([p.name, p.area, p.descriptor, p.cuisine].concat(p.tags, p.occasions).join(' '))) out.push({ href: ctx.link('place', p.slug), title: p.name, sub: p.descriptor + ' · ' + p.area });
+        });
+        data.guides.forEach(function (g) { if (has(g.title + ' ' + g.kicker)) out.push({ href: ctx.link('guide', g.slug), title: g.title, sub: 'Guide' }); });
+        return out.slice(0, 6);
+      };
+      if (input) {
+        input.addEventListener('input', function () {
+          var found = find(input.value);
+          results.innerHTML = found.map(function (f) {
+            return '<li><a href="' + f.href + '"><span class="mini-name">' + esc(f.title) + '</span><span class="mini-meta">' + esc(f.sub) + '</span></a></li>';
+          }).join('') || (input.value.trim() ? '<li class="menu-none">Nothing on the list matches that yet.</li>' : '');
+        });
+        input.addEventListener('keydown', function (e) {
+          if (e.key !== 'Enter') return;
+          var first = results.querySelector('a');
+          if (first) { e.preventDefault(); location.href = first.href; }
+        });
+      }
+      if (!MENU_BOUND && typeof document !== 'undefined') {
+        MENU_BOUND = true;
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') CLOSE_MENU(); });
+        document.addEventListener('click', function (e) { if (e.target.closest && !e.target.closest('.top')) CLOSE_MENU(); });
+      }
+    }
 
     // Rails: sideways scrollers with buttons and arrow keys
     each('[data-rail]', function (rail) {
