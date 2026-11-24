@@ -225,13 +225,16 @@
   function home(ctx, data) {
     var feat = data.guides.filter(function (g) { return g.featured; })[0] || data.guides[0];
     var inEdit = feat.places.map(function (s) { return byslug(data.places, s); }).filter(Boolean);
-    var lists = data.guides.filter(function (g) { return g !== feat; }).slice(0, 3);
-    var shortlist = data.places.filter(function (p) { return p.trending; }).concat(data.places.filter(function (p) { return !p.trending; })).slice(0, 5);
+    var others = data.guides.filter(function (x) { return x !== feat; }).slice(0, 4);
+    var five = data.places.filter(function (p) { return p.trending; }).concat(data.places.filter(function (p) { return !p.trending; })).slice(0, 5);
     var more = data.places.filter(function (p) { return p.category !== 'restaurant'; }).slice(0, 3);
     var areas = liveAreas(data).slice(0, 4);
     var g = data.site.gold;
+    function newsImage(n) {
+      var item = n.route === 'place' ? byslug(data.places, n.slug) : n.route === 'guide' ? byslug(data.guides, n.slug) : null;
+      return item ? item.image : 'terrace.jpg';
+    }
 
-    var others = data.guides.filter(function (x) { return x !== feat; }).slice(0, 4);
     return '<section class="feature"><div class="feature-bg"><img src="' + ctx.img(feat.image) + '" alt=""></div>' +
       '<div class="wrap feature-in">' +
       '<div class="feature-text"><p class="kicker">' + esc(feat.kicker) + ' · ' + esc(data.site.city) + '</p>' +
@@ -244,13 +247,27 @@
 
       '<section class="cover"><div class="wrap">' +
       '<ol class="edit-strip">' + inEdit.map(function (p, i) {
-        return '<li><a href="' + ctx.link('place', p.slug) + '"><span class="mini-num">' + num(i) + '</span><span class="mini-name">' + esc(p.name) + '</span><span class="mini-meta">' + esc(p.descriptor) + ' · ' + esc(p.area) + '</span></a></li>';
-      }).join('') + '</ol>' +
+        return '<li><a href="' + ctx.link('place', p.slug) + '"><span class="edit-thumb"><img src="' + ctx.img(p.image) + '" alt="" loading="lazy"></span>' +
+          '<span class="mini-num">' + num(i) + '</span><span class="mini-name">' + esc(p.name) + '</span><span class="mini-meta">' + esc(p.descriptor) + ' · ' + esc(p.area) + '</span></a></li>';
+      }).join('') + '</ol></div></section>' +
+
+      '<section class="rail-sec"><div class="wrap"><div class="sec-head"><h2>Five for this week</h2>' +
+      '<div class="rail-nav"><button type="button" class="rail-btn" data-rail-prev aria-label="Previous places">&#8592;</button><button type="button" class="rail-btn" data-rail-next aria-label="More places">&#8594;</button>' +
+      '<a class="text-link" href="' + ctx.link('places') + '">All places</a></div></div></div>' +
+      '<div class="rail" data-rail tabindex="0" role="group" aria-label="Five places for this week">' + five.map(function (p, i) {
+        return '<div class="rail-card">' + saveButton(p) + '<a href="' + ctx.link('place', p.slug) + '"><img src="' + ctx.img(p.image) + '" alt="' + esc(p.name) + '" loading="lazy">' +
+          '<span class="rail-num">' + num(i) + '</span>' +
+          '<span class="rail-text">' + (p.perk ? perkPill(p.perk) : '') + '<span class="rail-name">' + esc(p.name) + '</span>' +
+          '<span class="rail-meta">' + esc(p.descriptor) + ' · ' + esc(p.area) + ' · ' + esc(p.price) + '</span>' +
+          '<span class="rail-verdict">' + esc(p.verdict) + '</span></span></a></div>';
+      }).join('') +
+      '<a class="rail-card rail-more" href="' + ctx.link('places') + '"><span class="kicker">The full list</span><span class="rail-more-title">Browse all ' + data.places.length + ' places</span></a>' +
       '</div></section>' +
 
       '<section class="ideator" data-roulette><div class="wrap"><div class="ideator-box">' +
-      '<div class="ideator-head"><p class="kicker">Wonder List Roulette</p><h2>Tell us the mood. We will plan the evening.</h2></div>' +
-      '<div class="ideator-controls"><div><p class="label-sm">Where</p>' + rChips('area', liveAreas(data).map(function (a) { return a.name; }), 'Anywhere') + '</div>' +
+      '<div class="ideator-pic"><img src="' + ctx.img('terrace.jpg') + '" alt="A candlelit terrace restaurant at dusk" loading="lazy">' +
+      '<div class="pic-title"><small>Wonder List</small><span>Roulette</span></div><p class="pic-sub">Let us plan the perfect evening</p></div>' +
+      '<div class="ideator-controls"><h2>Tell us the mood. We will plan the evening.</h2><div><p class="label-sm">Where</p>' + rChips('area', liveAreas(data).map(function (a) { return a.name; }), 'Anywhere') + '</div>' +
       '<div><p class="label-sm">Occasion, pick one or two</p>' + rChips('occ', data.site.occasions) + '</div>' +
       '<div class="spin-row"><button type="button" class="btn btn-fill" data-spin>Spin</button><p class="muted" data-plan-note role="status" aria-live="polite"></p></div></div>' +
       '</div><div class="grid ideator-plan" data-plan></div></div></section>' +
@@ -258,34 +275,31 @@
       '<section class="cover cover-lists"><div class="wrap">' +
       '<div class="sec-head reels-head"><h2>Wonder Lists</h2><a class="text-link" href="' + ctx.link('guides') + '">All guides</a></div>' +
       '<div class="reels">' + others.map(function (r) { return reelTile(ctx, r, false); }).join('') + '</div>' +
-      '<div class="grid cover-grid">' +
+      '</div></section>' +
+
+      '<section><div class="wrap"><div class="pic-tiles">' +
       data.site.categories.map(function (c) {
-        var n = data.places.filter(function (p) { return p.category === c.id; }).length;
-        return '<a class="cell index-cell" href="' + ctx.link('category', c.slug) + '"><span class="index-word">' + esc(c.verb) + '</span><span class="index-sub">' + plural(n, lower(c.singular)) + '</span></a>';
+        var inCat = data.places.filter(function (p) { return p.category === c.id; });
+        return '<a class="pic-tile" href="' + ctx.link('category', c.slug) + '"><img src="' + ctx.img(inCat.length ? inCat[inCat.length > 1 ? 1 : 0].image : 'terrace.jpg') + '" alt="" loading="lazy">' +
+          '<span class="pic-tile-text"><span class="index-word">' + esc(c.verb) + '</span><span class="index-sub">' + plural(inCat.length, lower(c.singular)) + '</span></span></a>';
       }).join('') +
-      '<a class="cell index-cell" href="' + ctx.link('roulette') + '"><span class="index-word">Spin</span><span class="index-sub">Let us plan your evening</span></a>' +
+      '<a class="pic-tile" href="' + ctx.link('roulette') + '"><img src="' + ctx.img('private-room.jpg') + '" alt="" loading="lazy">' +
+      '<span class="pic-tile-text"><span class="index-word">Spin</span><span class="index-sub">Let us plan your evening</span></span></a>' +
       '</div></div></section>' +
 
       '<section><div class="wrap"><div class="sec-head"><h2>The latest</h2></div>' +
       '<div class="grid latest">' + (data.news || []).slice(0, 4).map(function (n) {
-        return '<a class="cell latest-cell" href="' + (n.slug ? ctx.link(n.route, n.slug) : ctx.link(n.route)) + '"><span class="kicker">' + esc(n.kicker) + '</span>' +
+        return '<a class="cell latest-cell" href="' + (n.slug ? ctx.link(n.route, n.slug) : ctx.link(n.route)) + '"><span class="tile-img latest-img"><img src="' + ctx.img(newsImage(n)) + '" alt="" loading="lazy"></span>' +
+          '<span class="kicker">' + esc(n.kicker) + '</span>' +
           '<span class="latest-title">' + esc(n.title) + '</span><span class="tile-sub">' + esc(n.text) + '</span><span class="latest-date">' + fmtDate(n.date) + '</span></a>';
       }).join('') + fillers((data.news || []).slice(0, 4).length) + '</div></div></section>' +
 
-      '<section><div class="wrap"><div class="sec-head"><h2>Five for this week</h2><a class="text-link" href="' + ctx.link('places') + '">All places</a></div>' +
-      '<div class="short-list">' + shortlist.map(function (p, i) {
-        return '<a class="short-row" href="' + ctx.link('place', p.slug) + '"><span class="short-num">' + num(i) + '</span>' +
-          '<span class="short-thumb"><img src="' + ctx.img(p.image) + '" alt="" loading="lazy"></span>' +
-          '<span class="short-main"><span class="short-name">' + esc(p.name) + '</span><span class="short-meta">' + esc(p.descriptor) + ' · ' + esc(p.area) + ' · ' + esc(p.price) + '</span></span>' +
-          '<span class="short-verdict">' + esc(p.verdict) + '</span>' +
-          '<span class="short-perk">' + (p.perk ? perkPill(p.perk) : '') + '</span></a>';
-      }).join('') + '</div></div></section>' +
-
       '<section><div class="wrap"><div class="sec-head"><h2>Where in ' + esc(data.site.city) + '</h2><a class="text-link" href="' + ctx.link('places') + '">All places</a></div>' +
-      '<div class="grid">' + areas.map(function (a) {
-        var n = data.places.filter(function (p) { return p.area === a.name; }).length;
-        return '<a class="cell area-cell" href="' + ctx.link('area', a.slug) + '"><span class="kicker">' + plural(n, 'place') + '</span><span class="area-name">' + esc(a.name) + '</span><span class="tile-sub">' + esc(a.intro) + '</span></a>';
-      }).join('') + fillers(areas.length) + '</div>' +
+      '<div class="pic-tiles tall">' + areas.map(function (a) {
+        var inArea = data.places.filter(function (p) { return p.area === a.name; });
+        return '<a class="pic-tile" href="' + ctx.link('area', a.slug) + '"><img src="' + ctx.img(inArea[inArea.length - 1].image) + '" alt="" loading="lazy">' +
+          '<span class="pic-tile-text"><span class="kicker">' + plural(inArea.length, 'place') + '</span><span class="area-name">' + esc(a.name) + '</span></span></a>';
+      }).join('') + '</div>' +
       '<div class="occasion-row"><span class="caps">What kind of evening?</span>' + occasionLinks(ctx, data) + '</div></div></section>' +
 
       '<section><div class="wrap"><div class="sec-head"><h2>Bars and hotels</h2></div>' +
@@ -296,9 +310,10 @@
       '</div></div></section>' +
 
       '<section class="gold-feature"><div class="wrap gold-feature-in">' +
+      '<div class="gold-feature-pic"><img src="' + ctx.img('private-room.jpg') + '" alt="A private dining room set for dinner beneath a chandelier" loading="lazy"></div>' +
       '<div class="gold-feature-lead"><p class="kicker">The Gold Card</p><h2>' + esc(g.title) + '</h2><p>' + esc(g.intro) + '</p>' +
-      waitlist() + '</div>' +
-      '<div class="gold-benefits">' + g.benefits.map(function (b) { return '<div><h3>' + esc(b.title) + '</h3><p>' + esc(b.text) + '</p></div>'; }).join('') + '</div>' +
+      waitlist() +
+      '<div class="gold-benefits">' + g.benefits.map(function (b) { return '<div><h3>' + esc(b.title) + '</h3><p>' + esc(b.text) + '</p></div>'; }).join('') + '</div></div>' +
       '</div></section>';
   }
 
@@ -345,7 +360,10 @@
     var tips = [['What to order', p.order], ['The table to book', p.bestTable], ['When to go', p.when]].filter(function (x) { return x[1]; });
     return '<div class="wrap">' + crumbs(meta.crumbs) +
       '<header class="place-head"><p class="kicker">' + esc(cat.singular) + ' · ' + esc(p.area) + ', ' + esc(p.city) + '</p>' +
-      '<h1>' + esc(p.name) + '</h1><p class="verdict">' + esc(p.verdict) + '</p>' +
+      '<h1>' + esc(p.name) + '</h1>' +
+      '<div class="head-row"><div class="chips"><a class="chip" href="' + ctx.link('area', area.slug) + '">' + esc(p.area) + '</a><span class="chip">' + esc(p.descriptor) + '</span><span class="chip">' + esc(p.price) + '</span></div>' +
+      (p.perk ? '<div class="perk-block"><span class="perk-label">' + logo() + 'Gold Card perk</span>' + perkPill(p.perk) + '</div>' : '') + '</div>' +
+      '<p class="verdict">' + esc(p.verdict) + '</p>' +
       '<div><button type="button" class="btn btn-sm save-btn" data-save="' + esc(p.slug) + '" aria-pressed="false"><span data-save-label>Save to My List</span></button></div></header>' +
       '<div class="grid place-grid">' +
       '<div class="cell span-2 place-gallery"><div class="gal-main"><img data-gal-main src="' + ctx.img(gal[0]) + '" alt="' + esc(p.name) + '"></div>' +
@@ -353,8 +371,6 @@
         return '<button type="button" data-gal="' + ctx.img(g) + '" aria-pressed="' + (i === 0) + '" aria-label="Photo ' + (i + 1) + ' of ' + esc(p.name) + '"><img src="' + ctx.img(g) + '" alt="" loading="lazy"></button>';
       }).join('') + '</div>' : '') + '</div>' +
       '<div class="cell span-2 place-info">' +
-      (p.perk ? '<div class="perk-row"><span class="perk-label">' + logo() + 'Gold Card perk</span>' + perkPill(p.perk) +
-        '<small>For Gold Card members. Show your card when you arrive. <a href="' + ctx.link('gold') + '">Join the list</a></small></div>' : '') +
       '<div><p class="label-sm">Know before you go</p><dl class="facts">' +
       fact('Area', '<a href="' + ctx.link('area', area.slug) + '">' + esc(p.area) + '</a>, ' + esc(p.city)) +
       fact('Address', esc(p.address)) +
@@ -364,6 +380,7 @@
       fact('Open', esc(p.hours)) +
       fact('Dress', esc(p.dress)) +
       fact('Good for', p.occasions.map(function (o) { return '<a href="' + ctx.link('occasion', slugify(o)) + '">' + esc(o) + '</a>'; }).join(', ')) +
+      fact('Gold Card perk', p.perk ? esc(p.perk) + '. Show your card when you arrive. <a href="' + ctx.link('gold') + '">Join the list</a>' : '') +
       '</dl></div>' +
       '<div><div class="actions" style="grid-template-columns:repeat(' + (p.phone ? 3 : 2) + ',1fr)">' +
       (p.bookingUrl ? '<a href="' + esc(p.bookingUrl) + '">Book</a>' : '<span>Book</span>') +
@@ -450,7 +467,8 @@
     return '<div class="wrap" data-roulette><div class="page-head"><p class="kicker">Wonder List</p><h1>Roulette</h1>' +
       '<p class="lede">Tired of scrolling? Give us a couple of prompts and we will plan your evening: a first drink, dinner and somewhere to end the night.</p></div>' +
       '<div class="grid">' +
-      '<div class="cell span-2 roulette-pic"><img src="' + ctx.img('dining-room-tables.jpg') + '" alt="Tables set for dinner, lit by small red lamps"></div>' +
+      '<div class="cell span-2 roulette-pic"><img src="' + ctx.img('dining-room-tables.jpg') + '" alt="Tables set for dinner, lit by small red lamps">' +
+      '<div class="pic-title"><small>Wonder List</small><span>Roulette</span></div><p class="pic-sub">Let us plan the perfect evening</p></div>' +
       '<div class="cell span-2 roulette-panel">' +
       '<div><h2>Choose your location</h2>' + rChips('area', liveAreas(data).map(function (a) { return a.name; }), 'Anywhere') + '</div>' +
       '<div><h2>Choose your occasion</h2>' + rChips('occ', data.site.occasions) + '<p class="note" style="margin-top:10px">Pick one or two.</p></div>' +
@@ -630,6 +648,22 @@
       });
     }
     paintSaved();
+
+    // Rails: sideways scrollers with buttons and arrow keys
+    each('[data-rail]', function (rail) {
+      var step = function (dir) {
+        var card = rail.querySelector('.rail-card');
+        rail.scrollBy({ left: dir * ((card ? card.offsetWidth : 320) + 16), behavior: 'smooth' });
+      };
+      var sec = rail.parentNode;
+      var prev = sec.querySelector('[data-rail-prev]'), next = sec.querySelector('[data-rail-next]');
+      if (prev) prev.addEventListener('click', function () { step(-1); });
+      if (next) next.addEventListener('click', function () { step(1); });
+      rail.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+      });
+    });
 
     // Place search and filters
     var filters = rootEl.querySelector('[data-filters]');
