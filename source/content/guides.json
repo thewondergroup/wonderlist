@@ -25,6 +25,30 @@
     "video": ""
   },
   {
+    "slug": "this-weekend",
+    "type": "weekly",
+    "kicker": "This weekend",
+    "title": "Five places for this weekend",
+    "standfirst": "From Friday's first drink to a long Sunday lunch.",
+    "image": "terrace-arches.jpg",
+    "featured": false,
+    "places": [
+      "bar-wonder",
+      "fallow",
+      "the-night-list",
+      "saltie-girl",
+      "delamina"
+    ],
+    "published": "2026-11-24",
+    "updated": "2026-11-24",
+    "author": "The Wonder List editors",
+    "intro": [
+      "The weekend, sorted. One bar to start in, two tables worth booking, somewhere to keep going and a lunch to recover over."
+    ],
+    "caption": "",
+    "video": ""
+  },
+  {
     "slug": "date-night",
     "type": "list",
     "kicker": "Wonder List",

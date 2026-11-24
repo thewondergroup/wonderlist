@@ -4,13 +4,14 @@ A guide to places of quality and style. Static site, built from a small set of c
 
 ## How it works
 
-Everything on the site comes from four files in `source/content/`:
+Everything on the site comes from five files in `source/content/`:
 
 | File | What it holds |
 |---|---|
 | `places.json` | Every venue: name, area, verdict, review, price, perk, practical details |
 | `guides.json` | Monthly edits and Wonder Lists, each with its list of places |
 | `areas.json` | Neighbourhoods and their introductions |
+| `news.json` | Short items for "The latest" on the homepage |
 | `site.json` | Site name, categories, occasions, Gold Card copy, Instagram and contact details |
 
 Run the build and it writes the finished site to the top level of this repository, which is where GitHub Pages serves it from:

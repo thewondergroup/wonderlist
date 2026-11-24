@@ -10,7 +10,7 @@ const WL = require('./src/site.js');
 
 const root = __dirname;
 const read = (f) => JSON.parse(fs.readFileSync(path.join(root, 'content', f), 'utf8'));
-const data = { site: read('site.json'), places: read('places.json'), guides: read('guides.json'), areas: read('areas.json') };
+const data = { site: read('site.json'), places: read('places.json'), guides: read('guides.json'), areas: read('areas.json'), news: read('news.json') };
 const SITE = data.site.url;
 
 // Fail the build on broken references, so the site and the app never get bad data.
@@ -27,6 +27,7 @@ data.guides.forEach((g) => {
   if (!images.has(g.image)) problems.push(`${g.slug}: missing image ${g.image}`);
   g.places.forEach((s) => { if (!slugs.has(s)) problems.push(`${g.slug}: unknown place ${s}`); });
 });
+data.news.forEach((n) => { if (n.route === 'place' && !slugs.has(n.slug)) problems.push(`news: unknown place ${n.slug}`); if (n.route === 'guide' && !data.guides.some((g) => g.slug === n.slug)) problems.push(`news: unknown guide ${n.slug}`); });
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -151,6 +152,7 @@ function copyShared(out, inlineFonts) {
   write(path.join(out, 'api/places.json'), JSON.stringify(data.places, null, 2));
   write(path.join(out, 'api/guides.json'), JSON.stringify(data.guides, null, 2));
   write(path.join(out, 'api/areas.json'), JSON.stringify(data.areas, null, 2));
+  write(path.join(out, 'api/news.json'), JSON.stringify(data.news, null, 2));
   write(path.join(out, 'api/site.json'), JSON.stringify(data.site, null, 2));
 }
 
@@ -163,6 +165,7 @@ const pages = [
   { file: 'roulette.html', route: { name: 'roulette' } },
   { file: 'gold.html', route: { name: 'gold' } },
   { file: 'links.html', route: { name: 'links' } },
+  { file: 'my-list.html', route: { name: 'my-list' } },
   { file: '404.html', route: { name: 'missing' } }
 ]
   .concat(data.places.map((p) => ({ file: `places/${p.slug}.html`, route: { name: 'place', slug: p.slug }, lastmod: p.updated })))
@@ -190,7 +193,7 @@ pages.forEach((pg) => {
   }));
 });
 
-const listed = pages.filter((p) => p.file !== '404.html' && p.file !== 'links.html');
+const listed = pages.filter((p) => !['404.html', 'links.html', 'my-list.html'].includes(p.file));
 write(path.join(dist, 'sitemap.xml'), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
   listed.map((p) => `  <url><loc>${pageUrl(p.file)}</loc><lastmod>${p.lastmod || today}</lastmod></url>`).join('\n') + '\n</urlset>\n');
 

@@ -98,9 +98,9 @@
     return '<header class="top"><div class="wrap top-in">' +
       '<nav class="nav nav-l" aria-label="Main">' + a('guides', 'Guides') + a('places', 'Places') + a('roulette', 'Roulette') + '</nav>' +
       '<a class="brand" href="' + ctx.link('home') + '" aria-label="The Wonder List home">' + logo() + '<span class="wordmark">The Wonder List</span></a>' +
-      '<nav class="nav nav-r" aria-label="Membership">' + a('gold', 'Gold Card', 'is-gold') + '<a class="btn btn-sm" href="' + ctx.link('gold') + '">Join the list</a></nav>' +
+      '<nav class="nav nav-r" aria-label="Membership">' + a('my-list', 'My List<span class="save-count" data-save-count></span>') + a('gold', 'Gold Card', 'is-gold') + '<a class="btn btn-sm" href="' + ctx.link('gold') + '">Join the list</a></nav>' +
       '</div></header>' +
-      '<nav class="tabs" aria-label="Sections">' + a('guides', 'Guides') + a('places', 'Places') + a('roulette', 'Roulette') + a('gold', 'Gold', 'is-gold') + '</nav>';
+      '<nav class="tabs" aria-label="Sections">' + a('guides', 'Guides') + a('places', 'Places') + a('roulette', 'Roulette') + a('my-list', 'My List') + a('gold', 'Gold', 'is-gold') + '</nav>';
   }
 
   function footer(ctx, data) {
@@ -143,12 +143,22 @@
       (faq.length % 2 ? '<div class="cell span-2 filler" aria-hidden="true"></div>' : '') + '</div></div></section>';
   }
 
+  function saveButton(p) {
+    return '<button type="button" class="save" data-save="' + esc(p.slug) + '" aria-pressed="false" aria-label="Save ' + esc(p.name) + ' to My List">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.600-7.5 10.200-7.500 10.200z"/></svg></button>';
+  }
+  function rChips(group, values, first) {
+    return '<div class="chips">' + (first ? '<button type="button" class="chip" data-r="' + group + '" data-value="" aria-pressed="true">' + first + '</button>' : '') +
+      values.map(function (v) {
+        return '<button type="button" class="chip" data-r="' + group + '" data-value="' + esc(v) + '" aria-pressed="' + (group === 'occ' && v === 'Romantic') + '">' + esc(v) + '</button>';
+      }).join('') + '</div>';
+  }
   function perkPill(text) { return '<span class="perk-pill">' + esc(text) + '</span>'; }
   function num(i) { return (i < 9 ? '0' : '') + (i + 1); }
 
   function placeCard(ctx, data, p) {
     var text = [p.name, p.area, p.descriptor, p.cuisine].concat(p.tags, p.occasions).join(' ').toLowerCase();
-    return '<div class="cell card" data-card data-category="' + esc(p.category) + '" data-area="' + esc(p.area) + '" data-price="' + esc(p.price) + '" data-perk="' + (p.perk ? 'yes' : '') + '" data-occasions="' + esc(p.occasions.join('|')) + '" data-text="' + esc(text) + '">' +
+    return '<div class="cell card" data-card data-category="' + esc(p.category) + '" data-area="' + esc(p.area) + '" data-price="' + esc(p.price) + '" data-perk="' + (p.perk ? 'yes' : '') + '" data-occasions="' + esc(p.occasions.join('|')) + '" data-text="' + esc(text) + '">' + saveButton(p) +
       '<a class="tile" href="' + ctx.link('place', p.slug) + '">' +
       '<div class="tile-img"><img src="' + ctx.img(p.image) + '" alt="' + esc(p.name) + ', ' + esc(p.descriptor.toLowerCase()) + ' in ' + esc(p.area) + '" loading="lazy">' +
       (p.perk ? '<span class="perk">' + esc(p.perk) + '</span>' : '') + '</div>' +
@@ -216,7 +226,7 @@
     var feat = data.guides.filter(function (g) { return g.featured; })[0] || data.guides[0];
     var inEdit = feat.places.map(function (s) { return byslug(data.places, s); }).filter(Boolean);
     var lists = data.guides.filter(function (g) { return g !== feat; }).slice(0, 3);
-    var shortlist = data.places.filter(function (p) { return p.trending; }).slice(0, 5);
+    var shortlist = data.places.filter(function (p) { return p.trending; }).concat(data.places.filter(function (p) { return !p.trending; })).slice(0, 5);
     var more = data.places.filter(function (p) { return p.category !== 'restaurant'; }).slice(0, 3);
     var areas = liveAreas(data).slice(0, 4);
     var g = data.site.gold;
@@ -236,6 +246,16 @@
       '<ol class="edit-strip">' + inEdit.map(function (p, i) {
         return '<li><a href="' + ctx.link('place', p.slug) + '"><span class="mini-num">' + num(i) + '</span><span class="mini-name">' + esc(p.name) + '</span><span class="mini-meta">' + esc(p.descriptor) + ' · ' + esc(p.area) + '</span></a></li>';
       }).join('') + '</ol>' +
+      '</div></section>' +
+
+      '<section class="ideator" data-roulette><div class="wrap"><div class="ideator-box">' +
+      '<div class="ideator-head"><p class="kicker">Wonder List Roulette</p><h2>Tell us the mood. We will plan the evening.</h2></div>' +
+      '<div class="ideator-controls"><div><p class="label-sm">Where</p>' + rChips('area', liveAreas(data).map(function (a) { return a.name; }), 'Anywhere') + '</div>' +
+      '<div><p class="label-sm">Occasion, pick one or two</p>' + rChips('occ', data.site.occasions) + '</div>' +
+      '<div class="spin-row"><button type="button" class="btn btn-fill" data-spin>Spin</button><p class="muted" data-plan-note role="status" aria-live="polite"></p></div></div>' +
+      '</div><div class="grid ideator-plan" data-plan></div></div></section>' +
+
+      '<section class="cover cover-lists"><div class="wrap">' +
       '<div class="sec-head reels-head"><h2>Wonder Lists</h2><a class="text-link" href="' + ctx.link('guides') + '">All guides</a></div>' +
       '<div class="reels">' + others.map(function (r) { return reelTile(ctx, r, false); }).join('') + '</div>' +
       '<div class="grid cover-grid">' +
@@ -246,7 +266,13 @@
       '<a class="cell index-cell" href="' + ctx.link('roulette') + '"><span class="index-word">Spin</span><span class="index-sub">Let us plan your evening</span></a>' +
       '</div></div></section>' +
 
-      '<section><div class="wrap"><div class="sec-head"><h2>The shortlist</h2><a class="text-link" href="' + ctx.link('places') + '">All places</a></div>' +
+      '<section><div class="wrap"><div class="sec-head"><h2>The latest</h2></div>' +
+      '<div class="grid latest">' + (data.news || []).slice(0, 4).map(function (n) {
+        return '<a class="cell latest-cell" href="' + (n.slug ? ctx.link(n.route, n.slug) : ctx.link(n.route)) + '"><span class="kicker">' + esc(n.kicker) + '</span>' +
+          '<span class="latest-title">' + esc(n.title) + '</span><span class="tile-sub">' + esc(n.text) + '</span><span class="latest-date">' + fmtDate(n.date) + '</span></a>';
+      }).join('') + fillers((data.news || []).slice(0, 4).length) + '</div></div></section>' +
+
+      '<section><div class="wrap"><div class="sec-head"><h2>Five for this week</h2><a class="text-link" href="' + ctx.link('places') + '">All places</a></div>' +
       '<div class="short-list">' + shortlist.map(function (p, i) {
         return '<a class="short-row" href="' + ctx.link('place', p.slug) + '"><span class="short-num">' + num(i) + '</span>' +
           '<span class="short-thumb"><img src="' + ctx.img(p.image) + '" alt="" loading="lazy"></span>' +
@@ -262,8 +288,6 @@
       }).join('') + fillers(areas.length) + '</div>' +
       '<div class="occasion-row"><span class="caps">What kind of evening?</span>' + occasionLinks(ctx, data) + '</div></div></section>' +
 
-      '<section><div class="wrap">' + rouletteBanner(ctx) + '</div></section>' +
-
       '<section><div class="wrap"><div class="sec-head"><h2>Bars and hotels</h2></div>' +
       '<div class="grid">' + more.map(function (p) { return placeCard(ctx, data, p); }).join('') +
       '<div class="cell card"><a class="tile cta-tile" href="' + ctx.link('places') + '"><p class="kicker">The full list</p>' +
@@ -273,7 +297,7 @@
 
       '<section class="gold-feature"><div class="wrap gold-feature-in">' +
       '<div class="gold-feature-lead"><p class="kicker">The Gold Card</p><h2>' + esc(g.title) + '</h2><p>' + esc(g.intro) + '</p>' +
-      '<div><a class="btn btn-ink" href="' + ctx.link('gold') + '">Join the list</a></div></div>' +
+      waitlist() + '</div>' +
       '<div class="gold-benefits">' + g.benefits.map(function (b) { return '<div><h3>' + esc(b.title) + '</h3><p>' + esc(b.text) + '</p></div>'; }).join('') + '</div>' +
       '</div></section>';
   }
@@ -321,7 +345,8 @@
     var tips = [['What to order', p.order], ['The table to book', p.bestTable], ['When to go', p.when]].filter(function (x) { return x[1]; });
     return '<div class="wrap">' + crumbs(meta.crumbs) +
       '<header class="place-head"><p class="kicker">' + esc(cat.singular) + ' · ' + esc(p.area) + ', ' + esc(p.city) + '</p>' +
-      '<h1>' + esc(p.name) + '</h1><p class="verdict">' + esc(p.verdict) + '</p></header>' +
+      '<h1>' + esc(p.name) + '</h1><p class="verdict">' + esc(p.verdict) + '</p>' +
+      '<div><button type="button" class="btn btn-sm save-btn" data-save="' + esc(p.slug) + '" aria-pressed="false"><span data-save-label>Save to My List</span></button></div></header>' +
       '<div class="grid place-grid">' +
       '<div class="cell span-2 place-gallery"><div class="gal-main"><img data-gal-main src="' + ctx.img(gal[0]) + '" alt="' + esc(p.name) + '"></div>' +
       (gal.length > 1 ? '<div class="thumbs">' + gal.slice(0, 4).map(function (g, i) {
@@ -422,19 +447,13 @@
   }
 
   function roulette(ctx, data) {
-    function chips(group, values, first) {
-      return '<div class="chips">' + (first ? '<button type="button" class="chip" data-r="' + group + '" data-value="" aria-pressed="true">' + first + '</button>' : '') +
-        values.map(function (v) {
-          return '<button type="button" class="chip" data-r="' + group + '" data-value="' + esc(v) + '" aria-pressed="' + (group === 'occ' && v === 'Romantic') + '">' + esc(v) + '</button>';
-        }).join('') + '</div>';
-    }
     return '<div class="wrap" data-roulette><div class="page-head"><p class="kicker">Wonder List</p><h1>Roulette</h1>' +
       '<p class="lede">Tired of scrolling? Give us a couple of prompts and we will plan your evening: a first drink, dinner and somewhere to end the night.</p></div>' +
       '<div class="grid">' +
       '<div class="cell span-2 roulette-pic"><img src="' + ctx.img('dining-room-tables.jpg') + '" alt="Tables set for dinner, lit by small red lamps"></div>' +
       '<div class="cell span-2 roulette-panel">' +
-      '<div><h2>Choose your location</h2>' + chips('area', liveAreas(data).map(function (a) { return a.name; }), 'Anywhere') + '</div>' +
-      '<div><h2>Choose your occasion</h2>' + chips('occ', data.site.occasions) + '<p class="note" style="margin-top:10px">Pick one or two.</p></div>' +
+      '<div><h2>Choose your location</h2>' + rChips('area', liveAreas(data).map(function (a) { return a.name; }), 'Anywhere') + '</div>' +
+      '<div><h2>Choose your occasion</h2>' + rChips('occ', data.site.occasions) + '<p class="note" style="margin-top:10px">Pick one or two.</p></div>' +
       '<div class="spin-row"><button type="button" class="btn" data-spin>Spin</button></div>' +
       '</div></div>' +
       '<div class="results-head"><h2>Your evening</h2><p class="muted" data-plan-note role="status" aria-live="polite"></p></div>' +
@@ -469,6 +488,15 @@
       '</div></div>';
   }
 
+  function mylist(ctx, data) {
+    return '<div class="wrap"><div class="page-head"><p class="kicker">Saved on this device</p><h1>My List</h1>' +
+      '<p class="lede">Tap the heart on any place to keep it here for later.</p></div>' +
+      '<p class="result-count" data-mylist-count role="status" aria-live="polite"></p>' +
+      '<div class="grid" data-mylist></div>' +
+      '<div class="empty-list" data-mylist-empty><p class="standfirst">Nothing saved yet.</p>' +
+      '<div class="hero-actions"><a class="btn btn-fill" href="' + ctx.link('places') + '">Browse places</a><a class="text-link" href="' + ctx.link('roulette') + '">Or spin the roulette</a></div></div></div>';
+  }
+
   function notFound(ctx) {
     return '<div class="wrap"><div class="page-head"><p class="kicker">Not found</p><h1>That page is not on the list</h1>' +
       '<p class="lede"><a class="text-link" href="' + ctx.link('home') + '">Back to the homepage</a></p></div></div>';
@@ -493,6 +521,7 @@
     else if (route.name === 'guides') { body = guides(ctx, data); title = 'Guides | ' + s.name; desc = 'Monthly edits and lists for every kind of evening.'; }
     else if (route.name === 'roulette') { body = roulette(ctx, data); title = 'Roulette | ' + s.name; desc = 'Tell us the mood and The Wonder List will plan your evening.'; }
     else if (route.name === 'gold') { body = gold(ctx, data); title = 'The Gold Card | ' + s.name; desc = s.gold.intro; }
+    else if (route.name === 'my-list') { body = mylist(ctx, data); title = 'My List | ' + s.name; desc = 'Places you have saved on The Wonder List.'; }
     else if (route.name === 'links') { body = links(ctx, data); title = 'Start here | ' + s.name; active = ''; }
     else if (route.name === 'place' && (item = byslug(data.places, route.slug))) {
       body = place(ctx, data, item, meta); title = item.name + ', ' + item.area + ': review and Gold Card perk | ' + s.name; desc = item.verdict; active = 'places';
@@ -561,8 +590,46 @@
 
   /* ---------- behaviour ---------- */
 
+  var SAVED_FALLBACK = [];
+
   function mount(rootEl, data, ctx) {
     var each = function (sel, fn, scope) { Array.prototype.forEach.call((scope || rootEl).querySelectorAll(sel), fn); };
+
+    // Saving places to My List (kept in this browser)
+    var readSaved = function () { try { return JSON.parse(localStorage.getItem('wl-saved') || '[]'); } catch (e) { return SAVED_FALLBACK; } };
+    var writeSaved = function (list) { SAVED_FALLBACK = list; try { localStorage.setItem('wl-saved', JSON.stringify(list)); } catch (e) { /* storage unavailable: keep for this visit only */ } };
+    var paintSaved = function () {
+      var saved = readSaved();
+      each('[data-save]', function (b) {
+        var on = saved.indexOf(b.getAttribute('data-save')) >= 0;
+        b.setAttribute('aria-pressed', String(on));
+        var label = b.querySelector('[data-save-label]');
+        if (label) label.textContent = on ? 'Saved to My List' : 'Save to My List';
+      });
+      each('[data-save-count]', function (c) { c.textContent = saved.length ? String(saved.length) : ''; }, document);
+      var listEl = rootEl.querySelector('[data-mylist]');
+      if (listEl) {
+        var places = saved.map(function (sl) { return byslug(data.places, sl); }).filter(Boolean);
+        listEl.innerHTML = places.map(function (p) { return placeCard(ctx, data, p); }).join('');
+        listEl.hidden = !places.length;
+        rootEl.querySelector('[data-mylist-empty]').hidden = places.length > 0;
+        rootEl.querySelector('[data-mylist-count]').textContent = places.length ? plural(places.length, 'place') + ' saved' : '';
+        each('[data-save]', function (b) { b.setAttribute('aria-pressed', 'true'); }, listEl);
+      }
+    };
+    if (!rootEl.__wlSave) {
+      rootEl.__wlSave = true;
+      rootEl.addEventListener('click', function (e) {
+        var b = e.target.closest ? e.target.closest('[data-save]') : null;
+        if (!b) return;
+        e.preventDefault();
+        var slug = b.getAttribute('data-save'), saved = readSaved(), i = saved.indexOf(slug);
+        if (i >= 0) saved.splice(i, 1); else saved.push(slug);
+        writeSaved(saved);
+        paintSaved();
+      });
+    }
+    paintSaved();
 
     // Place search and filters
     var filters = rootEl.querySelector('[data-filters]');
@@ -628,6 +695,7 @@
           (plan.exact ? '' : '. Closest matches shown.');
         var again = out.querySelector('[data-again]');
         if (again) again.addEventListener('click', spin);
+        paintSaved();
       };
       each('[data-r="area"]', function (btn) {
         btn.addEventListener('click', function () {

@@ -1,0 +1,34 @@
+[
+  {
+    "date": "2026-11-24",
+    "kicker": "New edit",
+    "title": "The December Edit has landed",
+    "text": "Five rooms worth dressing up for this month.",
+    "route": "guide",
+    "slug": "london-december-edit"
+  },
+  {
+    "date": "2026-11-21",
+    "kicker": "New on the list",
+    "title": "The Night List opens its doors in Soho",
+    "text": "A basement bar that holds its best tables for members.",
+    "route": "place",
+    "slug": "the-night-list"
+  },
+  {
+    "date": "2026-11-18",
+    "kicker": "New perk",
+    "title": "Bar Wonder joins the Gold Card",
+    "text": "A glass of champagne on arrival, every visit.",
+    "route": "place",
+    "slug": "bar-wonder"
+  },
+  {
+    "date": "2026-11-14",
+    "kicker": "Roulette",
+    "title": "Pick two moods, get a whole evening",
+    "text": "Roulette now plans all three stops: first drink, dinner, last stop.",
+    "route": "roulette",
+    "slug": ""
+  }
+]
